@@ -24,3 +24,9 @@ On first run, the container has to install all necessary composer packages.
 
 ``docker-compose logs -f php``
 
+### Running Testing
+``php artisan test``
+
+### Logging Mechanism
+For simplicity, logging is stored inside storage/logs/laravel.log.
+
