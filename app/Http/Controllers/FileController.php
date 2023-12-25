@@ -9,6 +9,16 @@ use League\Flysystem\UnableToRetrieveMetadata;
 
 class FileController extends Controller
 {
+    /**
+     * Note, I do not utilize any model saving here since the task at hand
+     * only requires that I save the file in GCP and return a downloadable content.
+     *
+     * For more complex file manipulation it is advised to save the file metadata in the
+     * database.
+     *
+     * @param UploadRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function upload(UploadRequest $request)
     {
         try {
@@ -30,6 +40,10 @@ class FileController extends Controller
         }
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse|\Symfony\Component\HttpFoundation\StreamedResponse
+     */
     public function download(Request $request)
     {
         try {
