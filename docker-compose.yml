@@ -1,0 +1,84 @@
+version: '3.8'
+
+x-environment: &env
+    environment:
+        - PROJECT_APP_NAME=Colivar
+        - PROJECT_APP_ENV=local
+        - PROJECT_APP_KEY=base64:XCFDpqTnCdSCRuNZvAPTXm9XdJW8+R6TSYm8lwNEP58=
+        - PROJECT_APP_DEBUG=true
+        - PROJECT_APP_URL=http://localhost
+        - PROJECT_DB_HOST=mysql
+        - PROJECT_DB_DATABASE=project
+        - PROJECT_DB_USERNAME=project_user
+        - PROJECT_DB_PASSWORD=project_pass
+        - PROJECT_MAIL_MAILER=smtp
+        - PROJECT_MAIL_HOST=mailhog
+        - PROJECT_MAIL_FROM_ADDRESS=admin@jcfrane.com
+        - PROJECT_LOG_SLACK_WEBHOOK_URL=https://hooks.slack.com/services/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
+        - PROJECT_AWS_ACCESS_KEY=sample
+        - PROJECT_AWS_SECRET_ACCESS_KEY=project
+        - PROJECT_AWS_DEFAULT_REGION=ap-southeast-1
+        - PROJECT_AWS_BUCKET=project
+        - PROJECT_AWS_ENDPOINT=http://minio:9000
+        - PROJECT_SCOUT_DRIVER=meilisearch
+        - PROJECT_MEILISEARCH_HOST=http://search:7700
+        - PROJECT_BROADCAST_DRIVER=pusher
+        - PROJECT_PUSHER_HOST=soketi
+        - PROJECT_PUSHER_APP_ID=app-id
+        - PROJECT_PUSHER_APP_KEY=app-key
+        - PROJECT_PUSHER_APP_SECRET=app-secret
+        - PROJECT_PUSHER_APP_CLUSTER=mt1
+        - PROJECT_PUSHER_PORT=6001
+        - MIX_WS_HOST=localhost
+        - MIX_WS_APP_KEY=app-key
+        - MIX_WS_PORT=6008
+
+x-deploy: &deploy
+    restart_policy:
+        condition: on-failure
+
+services:
+    server:
+        build:
+            context: .
+            dockerfile: nginx.dockerfile
+        ports:
+            - '3003:80'
+        volumes:
+            - ./:/var/www/html
+        deploy: *deploy
+        depends_on:
+            - php
+
+    php:
+        <<: *env
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: jcfranephp
+        deploy: *deploy
+        volumes:
+            - ./:/var/www/html:rw
+        depends_on:
+            - mysql
+        restart: on-failure
+
+    redis:
+        image: redis:alpine
+
+    mysql:
+        image: mysql/mysql-server:latest
+        volumes:
+            - 'colivar_db:/var/lib/mysql'
+        environment:
+            - MYSQL_DATABASE=project
+            - MYSQL_USER=project_user
+            - MYSQL_PASSWORD=project_pass
+            - MYSQL_ROOT_PASSWORD=project_pass
+            - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+        ports:
+            - '3002:3306'
+
+volumes:
+    colivar_db:
+
