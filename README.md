@@ -1,10 +1,12 @@
 # Requirements
 - Docker
 - Docker Compose
+- GCP setup with Cloud Storage
 
-# GCP
+# GCP Setup
 - Create a service account in IAM dashboard and download private key file.
 - Create a bucket in Cloud Storage and make sure the created service account has access to it.
+- For fine-grained ACL, make sure the service account has atleast Storage Object Creator and Storagge Object Viewer ACL.
 - Create a bucket and name it *colivar*
 
 # Docker
